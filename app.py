@@ -5,14 +5,26 @@ import pandas as pd
 from sklearn import tree
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
-import joblib  # Save models to a file
+import joblib
+import os
 
 # Initialize FastAPI app
 app = FastAPI()
 
-# Load the datasets
-df = pd.read_csv("model/stud_training.csv")
-tr = pd.read_csv("model/stud_testing.csv")
+# Define paths for models and datasets
+model_dir = "model/"
+decision_tree_model_path = os.path.join(model_dir, "decision_tree_model.pkl")
+random_forest_model_path = os.path.join(model_dir, "random_forest_model.pkl")
+naive_bayes_model_path = os.path.join(model_dir, "naive_bayes_model.pkl")
+stud_training_csv_path = os.path.join(model_dir, "stud_training.csv")
+
+# Load the models
+clf3 = joblib.load(decision_tree_model_path)
+clf4 = joblib.load(random_forest_model_path)
+gnb = joblib.load(naive_bayes_model_path)
+
+# Load the dataset
+df = pd.read_csv(stud_training_csv_path)
 
 # Define lists for interests and courses
 l1 = ['Drawing', 'Dancing', 'Singing', 'Sports', 'Video Game', 'Acting', 'Travelling', 'Gardening', 'Animals',
@@ -34,20 +46,6 @@ Course = ['BBA- Bachelor of Business Administration', 'BEM- Bachelor of Event Ma
           'B.Tech.-Electronics and Communication Engineering', 'B.Tech.-Mechanical Engineering', 'B.Com- Bachelor of Commerce',
           'BA in Economics', 'CA- Chartered Accountancy', 'CS- Company Secretary', 'Diploma in Dramatic Arts', 'MBBS',
           'Civil Services', 'BA in English', 'BA in Hindi', 'B.Ed.']
-
-# Preprocess dataset
-X = df[l1]
-y = df[["Courses"]].values.ravel()
-
-# Train models
-clf3 = tree.DecisionTreeClassifier().fit(X, y)
-clf4 = RandomForestClassifier().fit(X, y)
-gnb = GaussianNB().fit(X, y)
-
-# Save models to file (optional)
-joblib.dump(clf3, "model/decision_tree_model.pkl")
-joblib.dump(clf4, "model/random_forest_model.pkl")
-joblib.dump(gnb, "model/naive_bayes_model.pkl")
 
 # Define Pydantic model for the input data
 class InterestsInput(BaseModel):
